@@ -1,4 +1,4 @@
 pmocl-chambers-scrapers
 =======================
 
-PMOCLLow chamber (camara.cl) and High chamber (senado.cl)
+PMOCL low chamber (camara.cl) and high chamber (senado.cl). For use in morph.io platform.

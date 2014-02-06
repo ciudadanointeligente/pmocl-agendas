@@ -1,8 +1,56 @@
 # coding: utf-8
 
+require 'rubygems'
 require 'scraperwiki'
 require 'mechanize'
-require './scrapable_classes'
+require 'nokogiri'
+require 'pdf-reader'
+
+class StorageableInfo
+
+	def initialize(location = '')
+		@API_url = 'http://middleware.congresodechile.cl/'
+		@location = location
+	end
+
+	def process
+		doc_locations.each do |doc_location|
+			begin
+				doc = read doc_location
+				info = get_info doc
+				formatted_info = format info
+				save formatted_info
+			rescue Exception=>e
+				p e
+			end
+		end
+	end
+
+	def read location = @location
+		# it would be better if instead we used
+		# mimetype = `file -Ib #{path}`.gsub(/\n/,"")
+		if location.class.name != 'String'
+			doc = location
+		elsif !location.scan(/pdf/).empty?
+			doc_pdf = PDF::Reader.new(open(location))
+			doc = ''
+			doc_pdf.pages.each do |page|
+				doc += page.text
+			end
+		else
+			doc = open(location).read
+		end
+		doc
+	end
+
+	def doc_locations
+		[@location]
+	end
+
+	def get_info doc
+		doc
+	end
+end
 
 class CongressTable < StorageableInfo
 
@@ -249,4 +297,10 @@ class BillCategory < StorageableInfo
                 :matters => categories.join('|')
         	}
 	end
+end
+
+# Launcher
+if !(defined? Test::Unit::TestCase)
+  CurrentHighChamberTable.new.process
+  # CurrentLowChamberTable.new.process
 end

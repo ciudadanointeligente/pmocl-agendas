@@ -26,6 +26,7 @@ module RestfulApiMethods
 
   def post record
     if (ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? rescue true)
+      puts "Adds new record " + record['uid']
       ScraperWiki.save_sqlite(['uid'], record)
     else
       puts "Skipping already saved record " + record['uid']
@@ -96,9 +97,6 @@ class CongressTable < StorageableInfo
   end
 
   def save record
-    puts '</-- record --->'
-    puts record
-    puts '<--- record --/>'
     post record
   end
 
@@ -139,9 +137,9 @@ class CurrentHighChamberTable < CongressTable
         doc = read doc_location
         info = get_info doc #obtain the data values
         record = format info
-        puts 'record'
+        puts '</-- record --->'
         puts record
-        puts '/record'
+        puts '<--- record --/>'
         save record
       rescue Exception=>e
       end

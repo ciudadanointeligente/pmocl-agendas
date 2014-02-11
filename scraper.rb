@@ -113,7 +113,6 @@ class CongressTable < StorageableInfo
       'bill_list' => info['bill_list'],
       'date_scraped' => Date.today.to_s
     }
-    ScraperWiki.save_sqlite(['uid'], record)
   end
 
   def date_format date

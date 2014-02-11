@@ -101,12 +101,12 @@ class CongressTable < StorageableInfo
 
   def format info
     record = {
-      :uid => info['legislature'] + '-' + info['session'],
-      :date => info['date'],
-      :chamber => @chamber,
-      :legislature => info['legislature'],
-      :session => info['session'],
-      :bill_list => info['bill_list']
+      'uid' => info['legislature'] + '-' + info['session'],
+      'date' => info['date'],
+      'chamber' => @chamber,
+      'legislature' => info['legislature'],
+      'session' => info['session'],
+      'bill_list' => info['bill_list'].to_s
     }
   end
 

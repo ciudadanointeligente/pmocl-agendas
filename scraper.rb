@@ -82,7 +82,7 @@ class CongressTable < StorageableInfo
 
   def initialize()
     super()
-    @model = 'tables'
+    @model = 'agendas'
     @API_url = 'http://localhost:3000/'
     @chamber = ''
   end
@@ -92,14 +92,14 @@ class CongressTable < StorageableInfo
   end
 
   def post record
-    puts "1/2 Metodo de guardado en DB del registro"
+    puts "1/2 Try save in the data table..."
     if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? 
-      puts "Adds new record"
       ScraperWiki.save_sqlite(['uid'], record)
+      puts "Adds new record " + record['uid']
     else
       puts "Skipping already saved record " + record['uid']
     end
-    puts "2/2 Fin del guardado"
+    puts "2/2 Done!"
     # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
   end
 
@@ -142,8 +142,8 @@ class CurrentHighChamberTable < CongressTable
   end
 
   def process
-    puts 'processing'
-    puts doc_locations
+    # puts 'processing'
+    # puts doc_locations
     doc_locations.each do |doc_location|
       begin
         doc = read doc_location

@@ -91,11 +91,11 @@ class CongressTable < StorageableInfo
 
   def post record
     puts "1/2 Metodo de guardado en DB del registro"
-    if ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? 
+    if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? 
       puts "Adds new record"
-      ScraperWiki.save_sqlite(['council_reference'], record)
+      ScraperWiki.save_sqlite(['uid'], record)
     else
-      puts "Skipping already saved record " + record['council_reference']
+      puts "Skipping already saved record " + record['uid']
     end
     puts "2/2 Fin del guardado"
     # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
@@ -103,7 +103,7 @@ class CongressTable < StorageableInfo
 
   def format info
     record = {
-      'council_reference' => info['legislature'] + '-' + info['session'],
+      'uid' => info['legislature'] + '-' + info['session'],
       'date' => info['date'],
       'chamber' => @chamber,
       'legislature' => info['legislature'],
@@ -298,7 +298,7 @@ class BillCategory < StorageableInfo
     puts 'in format info'
     bill, categories = info
     record = {
-      'council_reference' => @bills[bill].first,
+      'uid' => @bills[bill].first,
       'matters' => categories.join('|')
     }
   end

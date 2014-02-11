@@ -1,11 +1,7 @@
-# coding: utf-8
-
 require 'rubygems'
 require 'scraperwiki'
-# require 'mechanize'
 require 'nokogiri'
 require 'pdf-reader'
-require 'open-uri'
 
 # --------------------
 # scrapable_classes.rb

@@ -93,7 +93,7 @@ class CongressTable < StorageableInfo
 
   def post record
     puts "1/2 Try save in the data table..."
-    if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? 
+    if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
       ScraperWiki.save_sqlite(['uid'], record)
       puts "Adds new record " + record['uid']
     else
@@ -145,7 +145,7 @@ class CurrentHighChamberTable < CongressTable
     # puts 'processing'
     # puts doc_locations
     doc_locations.each do |doc_location|
-      begin
+      #begin
         doc = read doc_location
         info = get_info doc #obtain the data values
         record = format info
@@ -153,8 +153,8 @@ class CurrentHighChamberTable < CongressTable
         puts record
         puts '<--- record --/>'
         save record
-      rescue Exception=>e
-      end
+      #rescue Exception=>e
+      #end
     end
   end
 

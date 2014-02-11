@@ -187,8 +187,10 @@ class CurrentHighChamberTable < CongressTable
     day = date [0]
     month = date [1]
     year = date [2]
+    if day.length < 2 then day = "0" + day end
     months_en = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
     months_int = {'enero' => '01', 'febrero' => '02', 'marzo' => '03', 'abril' => '04', 'mayo' => '05', 'junio' => '06', 'julio' => '07', 'agosto' => '08', 'septiembre' => '09', 'octubre' => '10', 'noviembre' => '11', 'diciembre' => '12'}
+
     date = [year, months_int[month], day]
     return date
   end

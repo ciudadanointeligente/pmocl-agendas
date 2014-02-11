@@ -96,10 +96,10 @@ class CongressTable < StorageableInfo
   end
 
   def save record
-    puts 'record'
+    puts '</-- record --->'
     puts record
-    puts '/record'
-    # post record
+    puts '<--- record --/>'
+    post record
   end
 
   # def post record
@@ -136,12 +136,8 @@ class CurrentHighChamberTable < CongressTable
     puts doc_locations
     doc_locations.each do |doc_location|
       begin
-        puts 'begun'
         doc = read doc_location
-        info = get_info doc
-        # puts 'info'
-        puts info
-        # puts '/info'
+        info = get_info doc #obtain the data values
         record = format info
         puts 'record'
         puts record
@@ -162,11 +158,10 @@ class CurrentHighChamberTable < CongressTable
 
   def get_info doc
     info = Hash.new
-    # puts doc    # [TIP] Verbose
 
     rx_bills = /Bolet(.*\d+-\d+)*/
     bills = doc.scan(rx_bills)
-    
+
     bill_list = []
     rx_bill_num = /(\d{0,3})[^0-9]*(\d{0,3})[^0-9]*(\d{1,3})[^0-9]*(-)[^0-9]*(\d{2})/
     bills.each do |bill|
@@ -176,8 +171,29 @@ class CurrentHighChamberTable < CongressTable
       end
     end
 
-    info['bill_list'] = bill_list
-    info
+    # Get date
+    rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
+    date_sp = doc.scan(rx_date).first
+    date = date_sp_2_en(date_sp).join(' ')
+
+    # Get legislature
+    rx_legislature = /LEGISLATURA\sN\W+.(\d{3})/
+    legislature = doc.scan(rx_legislature).flatten.first
+
+    # Get session
+    rx_session = /Sesi\Wn+.(\d{1,3})/
+    session = doc.scan(rx_session).flatten.first
+
+    return {'bill_list' => bill_list, 'date' => date, 'legislature' => legislature, 'session' => session}
+  end
+
+  def date_sp_2_en date
+    day = date [0]
+    month = date [1]
+    year = date [2]
+    months = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
+    en_date = [months[month], day, year]
+    return en_date
   end
 end
 
@@ -232,15 +248,6 @@ class CurrentLowChamberTable < CongressTable
     session = doc.scan(rx_session).flatten.first
 
     return {'bill_list' => bill_list, 'date' => date, 'legislature' => legislature, 'session' => session}
-  end
-
-  def date_sp_2_en date
-    day = date [0]
-    month = date [1]
-    year = date [2]
-    months = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
-    en_date = [months[month], day, year]
-    return en_date
   end
 end
 

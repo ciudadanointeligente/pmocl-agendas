@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'scraperwiki'
 require 'nokogiri'
 require 'pdf-reader'

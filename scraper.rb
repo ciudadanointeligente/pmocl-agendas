@@ -90,23 +90,26 @@ class CongressTable < StorageableInfo
   end
 
   def post record
-    if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?
-      puts "Adds new record " + record['uid']
-      ScraperWiki.save_sqlite(['uid'], record)
+    puts "Save record method"
+    if ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? 
+      puts "Adds new record"
+      ScraperWiki.save_sqlite(['council_reference'], record)
     else
-      puts "Skipping already saved record " + record['uid']
+      puts "Skipping already saved record " + record['council_reference']
     end
+    puts "End save record method"
     # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
   end
 
   def format info
     record = {
-      'uid' => info['legislature'] + '-' + info['session'],
+      'council_reference' => info['legislature'] + '-' + info['session'],
       'date' => info['date'],
       'chamber' => @chamber,
       'legislature' => info['legislature'],
       'session' => info['session'],
-      'bill_list' => info['bill_list'].to_s
+      'bill_list' => info['bill_list'],
+      'date_scraped' => Date.today.to_s
     }
   end
 
@@ -292,8 +295,8 @@ class BillCategory < StorageableInfo
     puts 'in format info'
     bill, categories = info
     record = {
-      :uid => @bills[bill].first,
-      :matters => categories.join('|')
+      'council_reference' => @bills[bill].first,
+      'matters' => categories.join('|')
     }
   end
 end

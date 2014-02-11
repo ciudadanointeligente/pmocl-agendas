@@ -95,7 +95,7 @@ class CongressTable < StorageableInfo
   end
 
   def post record
-    if (ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? rescue true)
+    if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?
       puts "Adds new record " + record['uid']
       ScraperWiki.save_sqlite(['uid'], record)
     else

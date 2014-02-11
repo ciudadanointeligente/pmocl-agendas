@@ -1,5 +1,7 @@
+require 'rubygems'
 require 'scraperwiki'
 require 'nokogiri'
+require 'open-uri'
 require 'pdf-reader'
 
 # --------------------

@@ -113,6 +113,18 @@ class CongressTable < StorageableInfo
     }
   end
 
+  def date_format date
+    day = date [0]
+    month = date [1]
+    year = date [2]
+    if day.length < 2 then day = "0" + day end
+    # months_en = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
+    months_num = {'enero' => '01', 'febrero' => '02', 'marzo' => '03', 'abril' => '04', 'mayo' => '05', 'junio' => '06', 'julio' => '07', 'agosto' => '08', 'septiembre' => '09', 'octubre' => '10', 'noviembre' => '11', 'diciembre' => '12'}
+
+    date = [year, months_num[month], day]
+    return date
+  end
+
   def get_link(url, base_url, xpath)
     html = Nokogiri::HTML.parse(read(url), nil, 'utf-8')
     base_url + html.xpath(xpath).first['href']
@@ -170,7 +182,7 @@ class CurrentHighChamberTable < CongressTable
     # Get date
     rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
     date_sp = doc.scan(rx_date).first
-    date = date_sp_2_en(date_sp).join('-')
+    date = date_format(date_sp).join('-')
 
     # Get legislature
     rx_legislature = /LEGISLATURA\sN\W+.(\d{3})/
@@ -181,18 +193,6 @@ class CurrentHighChamberTable < CongressTable
     session = doc.scan(rx_session).flatten.first
 
     return {'bill_list' => bill_list, 'date' => date, 'legislature' => legislature, 'session' => session}
-  end
-
-  def date_sp_2_en date
-    day = date [0]
-    month = date [1]
-    year = date [2]
-    if day.length < 2 then day = "0" + day end
-    months_en = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
-    months_int = {'enero' => '01', 'febrero' => '02', 'marzo' => '03', 'abril' => '04', 'mayo' => '05', 'junio' => '06', 'julio' => '07', 'agosto' => '08', 'septiembre' => '09', 'octubre' => '10', 'noviembre' => '11', 'diciembre' => '12'}
-
-    date = [year, months_int[month], day]
-    return date
   end
 end
 
@@ -236,7 +236,7 @@ class CurrentLowChamberTable < CongressTable
     # get date
     rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
     date_sp = doc.scan(rx_date).first
-    date = date_sp_2_en(date_sp).join(' ')
+    date = date_format(date_sp).join(' ')
 
     # get legislature
     rx_legislature = /(\d{3}).+LEGISLATURA/

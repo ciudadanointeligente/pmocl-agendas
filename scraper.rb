@@ -90,14 +90,14 @@ class CongressTable < StorageableInfo
   end
 
   def post record
-    puts "Save record method"
+    puts "1/2 Metodo de guardado en DB del registro"
     if ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? 
       puts "Adds new record"
       ScraperWiki.save_sqlite(['council_reference'], record)
     else
       puts "Skipping already saved record " + record['council_reference']
     end
-    puts "End save record method"
+    puts "2/2 Fin del guardado"
     # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
   end
 
@@ -170,7 +170,7 @@ class CurrentHighChamberTable < CongressTable
     # Get date
     rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
     date_sp = doc.scan(rx_date).first
-    date = date_sp_2_en(date_sp).join(' ')
+    date = date_sp_2_en(date_sp).join('-')
 
     # Get legislature
     rx_legislature = /LEGISLATURA\sN\W+.(\d{3})/
@@ -187,9 +187,10 @@ class CurrentHighChamberTable < CongressTable
     day = date [0]
     month = date [1]
     year = date [2]
-    months = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
-    en_date = [months[month], day, year]
-    return en_date
+    months_en = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
+    months_int = {'enero' => '01', 'febrero' => '02', 'marzo' => '03', 'abril' => '04', 'mayo' => '05', 'junio' => '06', 'julio' => '07', 'agosto' => '08', 'septiembre' => '09', 'octubre' => '10', 'noviembre' => '11', 'diciembre' => '12'}
+    date = [year, months_int[month], day]
+    return date
   end
 end
 

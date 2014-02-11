@@ -25,12 +25,6 @@ module RestfulApiMethods
   end
 
   def post record
-    if (ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? rescue true)
-      puts "Adds new record " + record['uid']
-      ScraperWiki.save_sqlite(['uid'], record)
-    else
-      puts "Skipping already saved record " + record['uid']
-    end
     # RestClient.post @API_url + @model, record, {:content_type => :json}
   end
 end
@@ -100,9 +94,15 @@ class CongressTable < StorageableInfo
     post record
   end
 
-  # def post record
-  #   RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
-  # end
+  def post record
+    if (ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? rescue true)
+      puts "Adds new record " + record['uid']
+      ScraperWiki.save_sqlite(['uid'], record)
+    else
+      puts "Skipping already saved record " + record['uid']
+    end
+    # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
+  end
 
   def format info
     record = {

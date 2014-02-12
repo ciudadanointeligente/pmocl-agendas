@@ -1,8 +1,11 @@
 require 'rubygems'
-require 'scraperwiki'
+# require 'scraperwiki'
+require 'rest-client'
+# require 'httparty'
 require 'nokogiri'
 require 'open-uri'
 require 'pdf-reader'
+require 'json'
 
 # --------------------
 # scrapable_classes.rb
@@ -12,17 +15,21 @@ module RestfulApiMethods
 
   @model =  ''
   @API_url = ''
+  @format = ''
 
   def format info
     info
   end
 
   def put record
-    # RestClient.put @API_url + @model, record, {:content_type => :json}
+    RestClient.put @API_url + @model, record, @format
+    # HTTParty.put [@API_url, @model, @id].join("/"), record
   end
 
   def post record
+    RestClient.post @API_url + @model, record, @format
     # RestClient.post @API_url + @model, record, {:content_type => :json}
+    # HTTParty.post [@API_url, @model].join("/"), record
   end
 end
 
@@ -30,7 +37,7 @@ class StorageableInfo
   include RestfulApiMethods
 
   def initialize(location = '')
-    @API_url = 'http://middleware.congresodechile.cl/'
+    @API_url = 'http://localhost:3000/'
     @location = location
   end
 
@@ -64,6 +71,7 @@ class StorageableInfo
     doc
   end
 
+#----- Undefined Functions -----
   def doc_locations
     [@location]
   end
@@ -71,11 +79,15 @@ class StorageableInfo
   def get_info doc
     doc
   end
+
+  def save record
+    put record
+  end
 end
 
 
 # ------------------------
-# sil_scrapable_classes.rb
+# pmo_scrapable_classes.rb
 # ------------------------
 
 class CongressTable < StorageableInfo
@@ -83,27 +95,55 @@ class CongressTable < StorageableInfo
   def initialize()
     super()
     @model = 'agendas'
-    @API_url = 'http://localhost:3000/'
+    @API_url = 'http://middleware.congresodechile.cl/'
+    @format = 'application/json'
+    @id = ''
     @chamber = ''
   end
 
   def save record
+    puts "<!----- debug ----->"
+    puts "@API_url: " + @API_url.to_s
+    puts "@model: " + @model.to_s
+    puts "@id: " + @id.to_s
+    puts "<----- debug -----/>"
     post record
+    # response = RestClient.get 'http://middleware.congresodechile.cl/agendas/361-91'
+    # response = RestClient.get [@API_url, @model, @id].join("/")
+    # puts "response.code: " + response.code.to_s
+    # if response.code == 200
+      # puts "-------- 200 ---------"
+      # put record
+    # else
+      # puts "-------- 404 ---------"
+      # post record
+    # end
+  end
+
+  def put record
+    RestClient.put @API_url + @model, {agenda: record}, {:content_type => :json}
+    # record.put([@API_url, @model, record['uid']].join("/"), @format)
   end
 
   def post record
-    puts "1/2 Try save in the data table..."
-    if ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty? 
-      ScraperWiki.save_sqlite(['uid'], record)
-      puts "Adds new record " + record['uid']
-    else
-      puts "Skipping already saved record " + record['uid']
-    end
-    puts "2/2 Done!"
-    # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
+    RestClient.post @API_url + @model, {agenda: record}, {:content_type => :json}
+    # record.post([@API_url, @model].join("/"), @format)
   end
 
+#  def post record
+#    puts "1/2 Try save in the data table..."
+#    if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
+#      ScraperWiki.save_sqlite(['uid'], record)
+#      puts "Adds new record " + record['uid']
+#    else
+#      puts "Skipping already saved record " + record['uid']
+#    end
+#    puts "2/2 Done!"
+#  end
+
   def format info
+    @id = info['legislature'] + '-' + info['session']
+
     record = {
       'uid' => info['legislature'] + '-' + info['session'],
       'date' => info['date'],
@@ -111,7 +151,7 @@ class CongressTable < StorageableInfo
       'legislature' => info['legislature'],
       'session' => info['session'],
       'bill_list' => info['bill_list'],
-      'date_scraped' => Date.today.to_s
+      # 'date_scraped' => Date.today.to_s
     }
   end
 
@@ -154,6 +194,7 @@ class CurrentHighChamberTable < CongressTable
         puts '<--- record --/>'
         save record
       rescue Exception=>e
+        puts e
       end
     end
   end
@@ -202,7 +243,7 @@ class CurrentLowChamberTable < CongressTable
 
   def initialize()
     super()
-    @model = 'low_chamber_agendas'
+    # @model = 'low_chamber_agendas'
     @location = 'http://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
     @chamber = 'C.Diputados'
     @session_base_url = 'http://www.camara.cl/trabajamos/'
@@ -252,59 +293,59 @@ class CurrentLowChamberTable < CongressTable
   end
 end
 
-class BillCategory < StorageableInfo
+# class BillCategory < StorageableInfo
 
-  def initialize
-    super()
-    @location = 'bill_categories'
-    @bills_location = 'bills'
-    @match_info_location = 'categories'
-    @model = 'bills'
+#   def initialize
+#     super()
+#     @location = 'bill_categories'
+#     @bills_location = 'bills'
+#     @match_info_location = 'categories'
+#     @model = 'bills'
 
-    @bills = parse(read(@bills_location))
-    @categorized_bills = parse(read(@match_info_location))
-  end
+#     @bills = parse(read(@bills_location))
+#     @categorized_bills = parse(read(@match_info_location))
+#   end
 
-  def save record
-    post record
-  end
+#   def save record
+#     post record
+#   end
 
-  def doc_locations
-    parse(read(@location))
-  end
+#   def doc_locations
+#     parse(read(@location))
+#   end
 
-  def parse doc
-    doc_hash = {}
-    doc.split(/\n/).each do |pair|
-      key, val = pair.split(/\t/)
-      if doc_hash.has_key?(key)
-        doc_hash[key].push(val)
-      else
-        doc_hash.store(key, [val])
-      end
-    end
-    doc_hash
-  end
+#   def parse doc
+#     doc_hash = {}
+#     doc.split(/\n/).each do |pair|
+#       key, val = pair.split(/\t/)
+#       if doc_hash.has_key?(key)
+#         doc_hash[key].push(val)
+#       else
+#         doc_hash.store(key, [val])
+#       end
+#     end
+#     doc_hash
+#   end
 
-  def get_info doc
-    bill, cat_ids = doc
-    cat_array = []
-    cat_ids.each do |cat_id|
-      cat_val = @categorized_bills[cat_id]
-      cat_array.push(cat_val)
-    end
-    [bill, cat_array]
-  end
+#   def get_info doc
+#     bill, cat_ids = doc
+#     cat_array = []
+#     cat_ids.each do |cat_id|
+#       cat_val = @categorized_bills[cat_id]
+#       cat_array.push(cat_val)
+#     end
+#     [bill, cat_array]
+#   end
 
-  def format info
-    puts 'in format info'
-    bill, categories = info
-    record = {
-      'uid' => @bills[bill].first,
-      'matters' => categories.join('|')
-    }
-  end
-end
+#   def format info
+#     puts 'in format info'
+#     bill, categories = info
+#     record = {
+#       'uid' => @bills[bill].first,
+#       'matters' => categories.join('|')
+#     }
+#   end
+# end
 
 
 # ----------------

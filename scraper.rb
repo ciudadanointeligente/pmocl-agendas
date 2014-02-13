@@ -3,6 +3,7 @@ require 'scraperwiki'
 require 'nokogiri'
 require 'open-uri'
 require 'pdf-reader'
+require 'json'
 
 # --------------------
 # scrapable_classes.rb
@@ -94,6 +95,8 @@ class CongressTable < StorageableInfo
   def post record
     puts "1/2 Try save in the data table..."
     if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
+      # Convert the array record['bill_list'] to a string (by converting to json)
+      record['bill_list'] = JSON.dump(record['bill_list'])
       ScraperWiki.save_sqlite(['uid'], record)
       puts "Adds new record " + record['uid']
     else

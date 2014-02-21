@@ -31,7 +31,7 @@ class StorageableInfo
   include RestfulApiMethods
 
   def initialize(location = '')
-    @API_url = 'http://middleware.congresodechile.cl/'
+    @API_url = 'http://localhost:3000/'
     @location = location
   end
 
@@ -39,9 +39,22 @@ class StorageableInfo
     doc_locations.each do |doc_location|
       begin
         doc = read doc_location
-        info = get_info doc
-        record = format info
-        save record
+        # puts "<!---- raw doc ------>"
+        # doc = doc.gsub /(\r?\n){3,}/, '\1\1'
+        # puts doc
+        # puts "<----- raw doc -----/>"
+        info = get_info doc # obtain the juice
+
+        info.delete_if { |k, v| v.nil? }
+        if !info['bill_list'].empty? # if the document is valid then
+          record = format info
+          # puts '<!---- debug ' + @chamber + ' ------>'
+          # puts record
+          # puts '<----- debug ' + @chamber + ' -----/>'
+          save record
+        else
+          puts "The current " + @chamber.to_s + " agenda hasn't relevant information."
+        end
       rescue Exception=>e
         p e
       end
@@ -75,16 +88,16 @@ class StorageableInfo
 end
 
 
-# ------------------------
-# sil_scrapable_classes.rb
-# ------------------------
+# ---------------
+# agendas_info.rb
+# ---------------
 
 class CongressTable < StorageableInfo
 
   def initialize()
     super()
     @model = 'agendas'
-    @API_url = 'http://localhost:3000/'
+    @API_url = 'http://middleware.congresoabierto.cl/'
     @chamber = ''
   end
 
@@ -93,7 +106,6 @@ class CongressTable < StorageableInfo
   end
 
   def post record
-    puts "1/2 Try save in the data table..."
     if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
       # Convert the array record['bill_list'] to a string (by converting to json)
       record['bill_list'] = JSON.dump(record['bill_list'])
@@ -102,8 +114,7 @@ class CongressTable < StorageableInfo
     else
       puts "Skipping already saved record " + record['uid']
     end
-    puts "2/2 Done!"
-    # RestClient.post @API_url + @model, {low_chamber_agenda: record}, {:content_type => :json}
+    RestClient.post @API_url + @model, {agendas: record}, {:content_type => :json}
   end
 
   def format info
@@ -123,7 +134,6 @@ class CongressTable < StorageableInfo
     month = date [1]
     year = date [2]
     if day.length < 2 then day = "0" + day end
-    # months_en = {'enero' => 'january', 'febrero' => 'february', 'marzo' => 'march', 'abril' => 'april', 'mayo' => 'may', 'junio' => 'june', 'julio' => 'july', 'agosto' => 'august', 'septiembre' => 'september', 'octubre' => 'october', 'noviembre' => 'november', 'diciembre' => 'december'}
     months_num = {'enero' => '01', 'febrero' => '02', 'marzo' => '03', 'abril' => '04', 'mayo' => '05', 'junio' => '06', 'julio' => '07', 'agosto' => '08', 'septiembre' => '09', 'octubre' => '10', 'noviembre' => '11', 'diciembre' => '12'}
 
     date = [year, months_num[month], day]
@@ -136,6 +146,7 @@ class CongressTable < StorageableInfo
   end
 end
 
+# ------------------------------------------------------------------------------------------------------------------------------------ SENADO -----------------------------
 class CurrentHighChamberTable < CongressTable
   def initialize()
     super()
@@ -144,22 +155,24 @@ class CurrentHighChamberTable < CongressTable
     @chamber = 'Senado'
   end
 
-  def process
-    # puts 'processing'
-    # puts doc_locations
-    doc_locations.each do |doc_location|
-      #begin
-        doc = read doc_location
-        info = get_info doc #obtain the data values
-        record = format info
-        puts '</-- record --->'
-        puts record
-        puts '<--- record --/>'
-        save record
-      #rescue Exception=>e
-      #end
-    end
-  end
+  # def process
+  #   # puts 'processing'
+  #   # puts doc_locations
+  #   doc_locations.each do |doc_location|
+  #     #begin
+  #       doc = read doc_location
+  #       info = get_info doc #obtain the data values
+  #       record = format info
+  #       puts "<!----- debug ----->"
+  #       puts record
+  #       puts "API url: " + @API_url.to_s
+  #       puts "model  : " + @model.to_s
+  #       puts "<----- debug -----/>"
+  #       save record
+  #     #rescue Exception=>e
+  #     #end
+  #   end
+  # end
 
   def doc_locations
     html = Nokogiri::HTML(read(@location), nil, 'utf-8')
@@ -187,7 +200,7 @@ class CurrentHighChamberTable < CongressTable
     # Get date
     rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
     date_sp = doc.scan(rx_date).first
-    date = date_format(date_sp).join('-')
+    if !date_sp.nil? then date = date_format(date_sp).join('-') end
 
     # Get legislature
     rx_legislature = /LEGISLATURA\sN\W+.(\d{3})/
@@ -201,11 +214,11 @@ class CurrentHighChamberTable < CongressTable
   end
 end
 
+# ------------------------------------------------------------------------------------------------------------------------------------ CAMARA -----------------------------
 class CurrentLowChamberTable < CongressTable
 
   def initialize()
     super()
-    @model = 'low_chamber_agendas'
     @location = 'http://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
     @chamber = 'C.Diputados'
     @session_base_url = 'http://www.camara.cl/trabajamos/'
@@ -218,9 +231,10 @@ class CurrentLowChamberTable < CongressTable
     doc_locations_array = Array.new
     # session_url = get_link(@location, @session_base_url, @session_xpath)
     table_url = get_link(@location, @table_base_url, @table_xpath)
-    puts "table_url"
+    puts "<!---- table_url ----->"
+    table_url = "http://www.camara.cl/pdf.aspx?prmID=10374&prmTIPO=TEXTOSESION"         # porque la ultima vale guano, asi que uso una tabla "valida"
     puts table_url
-    puts "/table_url"
+    puts "<----- table_url ----/>"
     doc_locations_array.push(table_url)
     # get all with doc.xpath('//*[@id="detail"]/table/tbody/tr[(position()>0)]/td[2]/a/@href').each do |tr|
   end
@@ -238,10 +252,14 @@ class CurrentLowChamberTable < CongressTable
       end
     end
 
+    rx_1 = /^\*{3}(.+)$/ # atrapa todo el txt ***
+    rx_2 = /Bolet.n\SN\s+.(\d+-\d+)*.\n\n\*{3}(.+)/ # atrapa billid + 1er txt ***
+
+
     # get date
     rx_date = /(\d{1,2}) (?:de ){0,1}(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre) (?:de ){0,1}(\d{4})/
     date_sp = doc.scan(rx_date).first
-    date = date_format(date_sp).join(' ')
+    if !date_sp.nil? then date = date_format(date_sp).join('-') end
 
     # get legislature
     rx_legislature = /(\d{3}).+LEGISLATURA/
@@ -255,66 +273,66 @@ class CurrentLowChamberTable < CongressTable
   end
 end
 
-class BillCategory < StorageableInfo
+# class BillCategory < StorageableInfo
 
-  def initialize
-    super()
-    @location = 'bill_categories'
-    @bills_location = 'bills'
-    @match_info_location = 'categories'
-    @model = 'bills'
+#   def initialize
+#     super()
+#     @location = 'bill_categories'
+#     @bills_location = 'bills'
+#     @match_info_location = 'categories'
+#     @model = 'bills'
 
-    @bills = parse(read(@bills_location))
-    @categorized_bills = parse(read(@match_info_location))
-  end
+#     @bills = parse(read(@bills_location))
+#     @categorized_bills = parse(read(@match_info_location))
+#   end
 
-  def save record
-    post record
-  end
+#   def save record
+#     post record
+#   end
 
-  def doc_locations
-    parse(read(@location))
-  end
+#   def doc_locations
+#     parse(read(@location))
+#   end
 
-  def parse doc
-    doc_hash = {}
-    doc.split(/\n/).each do |pair|
-      key, val = pair.split(/\t/)
-      if doc_hash.has_key?(key)
-        doc_hash[key].push(val)
-      else
-        doc_hash.store(key, [val])
-      end
-    end
-    doc_hash
-  end
+#   def parse doc
+#     doc_hash = {}
+#     doc.split(/\n/).each do |pair|
+#       key, val = pair.split(/\t/)
+#       if doc_hash.has_key?(key)
+#         doc_hash[key].push(val)
+#       else
+#         doc_hash.store(key, [val])
+#       end
+#     end
+#     doc_hash
+#   end
 
-  def get_info doc
-    bill, cat_ids = doc
-    cat_array = []
-    cat_ids.each do |cat_id|
-      cat_val = @categorized_bills[cat_id]
-      cat_array.push(cat_val)
-    end
-    [bill, cat_array]
-  end
+#   def get_info doc
+#     bill, cat_ids = doc
+#     cat_array = []
+#     cat_ids.each do |cat_id|
+#       cat_val = @categorized_bills[cat_id]
+#       cat_array.push(cat_val)
+#     end
+#     [bill, cat_array]
+#   end
 
-  def format info
-    puts 'in format info'
-    bill, categories = info
-    record = {
-      'uid' => @bills[bill].first,
-      'matters' => categories.join('|')
-    }
-  end
-end
+#   def format info
+#     puts 'in format info'
+#     bill, categories = info
+#     record = {
+#       'uid' => @bills[bill].first,
+#       'matters' => categories.join('|')
+#     }
+#   end
+# end
 
 
-# ----------------
-# launcher scraper
-# ----------------
+# -----------------
+# agendas_runner.rb
+# -----------------
 
 if !(defined? Test::Unit::TestCase)
   CurrentHighChamberTable.new.process
-  # CurrentLowChamberTable.new.process
+  CurrentLowChamberTable.new.process
 end

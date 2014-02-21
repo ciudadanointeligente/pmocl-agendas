@@ -2,6 +2,7 @@ require 'rubygems'
 require 'scraperwiki'
 require 'nokogiri'
 require 'open-uri'
+require 'rest-client'
 require 'pdf-reader'
 require 'json'
 
@@ -107,6 +108,7 @@ class CongressTable < StorageableInfo
 
   def post record
     if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
+      RestClient.post @API_url + @model, {agenda: record}, {:content_type => :json}
       # Convert the array record['bill_list'] to a string (by converting to json)
       record['bill_list'] = JSON.dump(record['bill_list'])
       ScraperWiki.save_sqlite(['uid'], record)
@@ -114,7 +116,6 @@ class CongressTable < StorageableInfo
     else
       puts "Skipping already saved record " + record['uid']
     end
-    RestClient.post @API_url + @model, {agendas: record}, {:content_type => :json}
   end
 
   def format info

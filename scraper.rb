@@ -376,7 +376,7 @@ class CurrentLowChamberBillQuorum < CongressTable
       raw_quorum.each do |quorum|
         if quorum.include? "nica constitucional"
           num_quorum.push("4/7")
-        elsif quorum.include? "interpretativa de la constitución"
+        elsif quorum.include? "interpretativa de la constituci"
           num_quorum.push("3/5")
         elsif quorum.include? "rum calificado" #mayoría absoluta
           num_quorum.push("60+")

@@ -1,6 +1,6 @@
 require 'rubygems'
-# require 'scraperwiki'
-require 'rest-client'
+require 'scraperwiki'
+#require 'rest-client'
 require 'nokogiri'
 require 'open-uri'
 require 'pdf-reader'
@@ -110,21 +110,21 @@ class CongressTable < StorageableInfo
     # for use with morph.io
     #######################
 
-    # if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
-    #   # Convert the array record['bill_list'] to a string (by converting to json)
-    #   record['bill_list'] = JSON.dump(record['bill_list'])
-    #   ScraperWiki.save_sqlite(['uid'], record)
-    #   puts "Adds new record " + record['uid']
-    # else
-    #   puts "Skipping already saved record " + record['uid']
-    # end
+    if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
+      # Convert the array record['bill_list'] to a string (by converting to json)
+      record['bill_list'] = JSON.dump(record['bill_list'])
+      ScraperWiki.save_sqlite(['uid'], record)
+      puts "Adds new record " + record['uid']
+    else
+      puts "Skipping already saved record " + record['uid']
+    end
 
     ###############################
     # for use with pmocl middleware
     ###############################
 
-    RestClient.post @API_url + @model, {agenda: record}, {:content_type => :json}
-    puts "Saved"
+    #RestClient.post @API_url + @model, {agenda: record}, {:content_type => :json}
+    #puts "Saved"
   end
 
   def format info
@@ -294,22 +294,22 @@ class CurrentLowChamberBillQuorum < CongressTable
     # for use with morph.io
     #######################
 
-    # if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
-    #   # Convert the array record['bill_list'] to a string (by converting to json)
-    #   record['bill_list'] = JSON.dump(record['bill_list'])
-    #   ScraperWiki.save_sqlite(['uid'], record)
-    #   puts "Adds new record " + record['uid']
-    # else
-    #   puts "Skipping already saved record " + record['uid']
-    # end
+    if ((ScraperWiki.select("* from data where `uid`='#{record['uid']}'").empty?) rescue true)
+      # Convert the array record['bill_list'] to a string (by converting to json)
+      record['bill_list'] = JSON.dump(record['bill_list'])
+      ScraperWiki.save_sqlite(['uid'], record)
+      puts "Adds new record " + record['uid']
+    else
+      puts "Skipping already saved record " + record['uid']
+    end
 
     ###############################
     # for use with pmocl middleware
     ###############################
 
-    RestClient.post @API_url + @model, {bill_quorum: record}, {:content_type => :json}
-    puts "Saved"
-    sleep 0.1
+    #RestClient.post @API_url + @model, {bill_quorum: record}, {:content_type => :json}
+    #puts "Saved"
+    #sleep 0.1
   end
 
   def format info
@@ -400,8 +400,8 @@ end
 # -----------------
 
 if !(defined? Test::Unit::TestCase)
-  # CurrentHighChamberAgenda.new.process
+  CurrentHighChamberAgenda.new.process
   # CurrentHighChamberBillQuorum.new.process
-  # CurrentLowChamberAgenda.new.process
-  CurrentLowChamberBillQuorum.new.process
+  CurrentLowChamberAgenda.new.process
+  #CurrentLowChamberBillQuorum.new.process
 end

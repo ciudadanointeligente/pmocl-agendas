@@ -374,11 +374,11 @@ class CurrentLowChamberBillQuorum < CongressTable
 
       # formatting to a fractional representation
       raw_quorum.each do |quorum|
-        if quorum.include? "orgánica constitucional"
+        if quorum.include? "nica constitucional"
           num_quorum.push("4/7")
         elsif quorum.include? "interpretativa de la constitución"
           num_quorum.push("3/5")
-        elsif quorum.include? "quórum calificado" #mayoría absoluta
+        elsif quorum.include? "rum calificado" #mayoría absoluta
           num_quorum.push("60+")
         else
           num_quorum.push(quorum)

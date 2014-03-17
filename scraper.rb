@@ -260,32 +260,6 @@ end
 # -----------------
 
 if !(defined? Test::Unit::TestCase)
-  # Temp
-  record = Hash.new
-  record = {"uid"=>"S361-91", "date"=>"2014-03-04", "chamber"=>"Senado", "legislature"=>"361", "session"=>"91", "bill_list"=>["2973-11", "6355-01", "8189-04", "9036-07", "4426-07", "8179-07", "7908-15", "8813-15", "9201-03", "8624-07", "9158-15", "9086-17", "9179-07", "1506-08", "9123-17", "9233-01"], "date_scraped"=>"2014-02-28"}
-  record['bill_list'] = JSON.dump(record['bill_list'])
-  ScraperWiki.save_sqlite(['uid'], record)
-
-  record = {}
-  record = {"uid"=>"C361-123", "date"=>"2014-03-05", "chamber"=>"C.Diputados", "legislature"=>"361", "session"=>"123", "bill_list"=>["2687-16", "3851-16", "9069-07", "9047-21"], "date_scraped"=>"2014-03-04"}
-  record['bill_list'] = JSON.dump(record['bill_list'])
-  ScraperWiki.save_sqlite(['uid'], record)
-
-  record = {}
-  record = {"uid"=>"S361-92", "date"=>"2014-03-05", "chamber"=>"Senado", "legislature"=>"361", "session"=>"92", "bill_list"=>["9173-07", "9231-13", "9156-32", "1638-12", "1639-12", "1640-12", "6190-19", "9036-07", "8189-04", "9233-01", "4426-07", "8179-07", "8829-01", "8314-07", "8813-15", "5579-03", "2973-11", "6355-01", "7908-15", "9201-03", "8624-07", "9158-15", "9086-17", "9179-07", "1506-08", "9123-17", "5491-24"], "date_scraped"=>"2014-03-05"}
-  record['bill_list'] = JSON.dump(record['bill_list'])
-  ScraperWiki.save_sqlite(['uid'], record)
-
-  record = {}
-  record = {"uid"=>"C362-2", "date"=>"2014-03-13", "chamber"=>"C.Diputados", "legislature"=>"362", "session"=>"2", "bill_list"=>["9047-21", "9273-05", "9096-10", "9133-12"], "date_scraped"=>"2014-03-13"}
-  record['bill_list'] = JSON.dump(record['bill_list'])
-  ScraperWiki.save_sqlite(['uid'], record)
-
-  record = {}
-  record = {"uid"=>"C362-3", "date"=>"2014-03-18", "chamber"=>"C.Diputados", "legislature"=>"362", "session"=>"3", "bill_list"=>["9029-14", "9133-12", "9096-10"], "date_scraped"=>"2014-03-14"}
-  record['bill_list'] = JSON.dump(record['bill_list'])
-  ScraperWiki.save_sqlite(['uid'], record)
-
-  #CurrentHighChamberAgenda.new.process
-  #CurrentLowChamberAgenda.new.process
+  CurrentHighChamberAgenda.new.process
+  CurrentLowChamberAgenda.new.process
 end

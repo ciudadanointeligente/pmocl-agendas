@@ -129,7 +129,7 @@ class CongressTable < StorageableInfo
 
   def format info
     record = {
-      'uid' => info['legislature'] + '-' + info['session'],
+      'uid' => @chamber.chr + info['legislature'] + '-' + info['session'],
       'date' => info['date'],
       'chamber' => @chamber,
       'legislature' => info['legislature'],

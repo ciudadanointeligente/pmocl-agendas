@@ -175,7 +175,7 @@ class CurrentHighChamberAgenda < CongressTable
   def get_info doc
     info = Hash.new
 
-    rx_bills = /Bolet(.*\d+-\d+)<a/ #/Bolet(.*\d+-\d+)*/
+    rx_bills = /Bolet(.*\d+-\d+)\W/
     bills = doc.scan(rx_bills)
 
     bill_list = []

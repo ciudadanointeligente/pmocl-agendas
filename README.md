@@ -1,8 +1,7 @@
 pmocl-agendas
 =============
 
-Scraper for Chilean's low chamber (camara.cl) and high chamber (senado.cl) agendas. For use in the (awesome) [morph.io](http://morph.io/) platform.
-
+Scraper for Chilean's low chamber (camara.cl) and high chamber (senado.cl) agendas. This is a scraper that runs on [Morph](https://morph.io). To get started [see the documentation](https://morph.io/documentation)
 
 ### Everything else:
 

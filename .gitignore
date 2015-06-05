@@ -1,3 +1,7 @@
+# ignore output of scraper
+data.sqlite
+
+# misc
 *.gem
 *.rbc
 .bundle
@@ -11,7 +15,6 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-*.sqlite
 /vendor/gems
 
 # YARD artifacts

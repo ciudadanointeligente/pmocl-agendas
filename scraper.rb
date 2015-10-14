@@ -211,10 +211,10 @@ class CurrentLowChamberAgenda < CongressTable
 
   def initialize()
     super()
-    @location = 'http://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
+    @location = 'https://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
     @chamber = 'C.Diputados'
-    @session_base_url = 'http://www.camara.cl/trabajamos/'
-    @table_base_url = 'http://www.camara.cl'
+    @session_base_url = 'https://www.camara.cl/trabajamos/'
+    @table_base_url = 'https://www.camara.cl'
     @session_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td[2]/a'
     @table_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td/a'
   end

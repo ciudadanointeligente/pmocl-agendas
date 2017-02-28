@@ -35,7 +35,7 @@ class StorageableInfo
   include RestfulApiMethods
 
   def initialize(location = '')
-    @API_url = 'http://localhost:3000/'
+    @API_url = '//localhost:3000/'
     @location = location
   end
 
@@ -100,7 +100,7 @@ class CongressTable < StorageableInfo
   def initialize()
     super()
     @model = 'agendas'
-    @API_url = 'http://middleware.congresoabierto.cl/'
+    @API_url = '//middleware.congresoabierto.cl/'
     @chamber = ''
   end
 
@@ -162,8 +162,8 @@ end
 class CurrentHighChamberAgenda < CongressTable
   def initialize()
     super()
-    @location = 'http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
-    @base_url = 'http://www.senado.cl'
+    @location = '//www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
+    @base_url = '//www.senado.cl'
     @chamber = 'Senado'
   end
 
@@ -211,10 +211,10 @@ class CurrentLowChamberAgenda < CongressTable
 
   def initialize()
     super()
-    @location = 'https://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
+    @location = '//www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
     @chamber = 'C.Diputados'
     @session_base_url = 'https://www.camara.cl/trabajamos/'
-    @table_base_url = 'https://www.camara.cl'
+    @table_base_url = '//www.camara.cl'
     @session_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td[2]/a'
     @table_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td/a'
   end

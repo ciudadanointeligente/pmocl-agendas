@@ -162,8 +162,8 @@ end
 class CurrentHighChamberAgenda < CongressTable
   def initialize()
     super()
-    @location = '//www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
-    @base_url = '//www.senado.cl'
+    @location = 'http://www.senado.cl/appsenado/index.php?mo=sesionessala&ac=doctosSesion&tipo=27'
+    @base_url = 'http://www.senado.cl'
     @chamber = 'Senado'
   end
 
@@ -211,10 +211,10 @@ class CurrentLowChamberAgenda < CongressTable
 
   def initialize()
     super()
-    @location = '//www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
+    @location = 'https://www.camara.cl/trabajamos/sala_documentos.aspx?prmTIPO=TABLA'
     @chamber = 'C.Diputados'
     @session_base_url = 'https://www.camara.cl/trabajamos/'
-    @table_base_url = '//www.camara.cl'
+    @table_base_url = 'https://www.camara.cl'
     @session_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td[2]/a'
     @table_xpath = '//*[@id="detail"]/table/tbody/tr[1]/td/a'
   end
@@ -230,7 +230,7 @@ class CurrentLowChamberAgenda < CongressTable
   def get_info doc
     rx_bills = /Bolet(.*\d+-\d+)*/
     bills = doc.scan(rx_bills)
-    
+
     bill_list = []
     rx_bill_num = /(\d{0,3})[^0-9]*(\d{0,3})[^0-9]*(\d{1,3})[^0-9]*(-)[^0-9]*(\d{2})/
     bills.each do |bill|

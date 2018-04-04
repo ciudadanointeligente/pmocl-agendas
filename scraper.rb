@@ -264,5 +264,5 @@ end
 
 if !(defined? Test::Unit::TestCase)
   CurrentHighChamberAgenda.new.process
-  CurrentLowChamberAgenda.new.process
+  #CurrentLowChamberAgenda.new.process
 end
